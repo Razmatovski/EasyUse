@@ -30,6 +30,9 @@
    PIPEDRIVE_API_TOKEN=xxxxxxxx
    PIPEDRIVE_BASE_URL=https://api.pipedrive.com/v1
    TURNSTILE_SECRET_KEY=xxxxxxxx
+   SERVICE_AREA_CENTER_LAT=51.109
+   SERVICE_AREA_CENTER_LON=17.032
+   SERVICE_AREA_RADIUS_KM=30
    ```
 3. Запустите сервер в режиме разработки:
    ```bash
@@ -58,6 +61,19 @@ curl -X POST http://localhost:3000/api/estimate \
     "postal_code":"50-123"
   }'
 ```
+
+## Справочник почтовых индексов
+
+Локальный файл `helpers/pl_zip_geocodes.json` содержит соответствие между почтовыми индексами Польши и их геокоординатами. Формат:
+
+```json
+{
+  "50-001": { "lat": 51.109, "lon": 17.032 },
+  "00-001": { "lat": 52.2297, "lon": 21.0122 }
+}
+```
+
+Ключ — почтовый индекс, значение — объект с широтой `lat` и долготой `lon` (в градусах).
 
 ## Тестирование
 ```bash
