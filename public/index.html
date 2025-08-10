@@ -173,9 +173,11 @@ nextBtn.onclick = async () => {
   if(currentStep===5){
     state.name = document.getElementById('name').value;
     state.phone = document.getElementById('phone').value;
-    const res = await fetch('/api/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({area_m2:state.area_m2,scope:state.scope,tile_type:state.tile_type,plumbing:state.plumbing})});
+    const res = await fetch('/api/estimate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({area_m2:state.area_m2,scope:state.scope,tile_type:state.tile_type,plumbing:state.plumbing,postal_code:state.postal_code})});
     const data = await res.json();
-    state.estimate = data;
+    state.estimate = { low:data.low, high:data.high, days_min:data.days_min, days_max:data.days_max };
+    state.serviceable = data.serviceable;
+    state.distance_km = data.distance_km;
     document.getElementById('result').textContent = `${data.low}-${data.high} PLN, ${data.days_min}-${data.days_max} dni`;
     fetch('/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(state)});
     const wa = buildWhatsAppLink({phone:'48500111222',lang:state.lang,payload:{name:state.name,phone:state.phone,estimate:data}});
