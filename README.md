@@ -9,6 +9,10 @@
    ```bash
    npm install
    ```
+   или установите необходимые пакеты вручную:
+   ```bash
+   npm install zod nodemailer google-auth-library node-fetch
+   ```
 2. Создайте файл `.env` с необходимыми переменными окружения.
    Пример:
    ```env
