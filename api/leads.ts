@@ -4,6 +4,7 @@ import { z } from "zod";
 import { sendClientEmail, sendAdminEmail } from "../mail";
 import { saveLead } from "../storage";
 import { verifyTurnstile } from "../turnstile";
+import { createHash } from "crypto";
 
 const LeadSchema = z.object({
   name: z.string().min(2).max(60),
@@ -17,7 +18,10 @@ const LeadSchema = z.object({
   quiz_answers: z.record(z.any()),
   estimate: z.object({ low: z.number(), high: z.number(), days_min: z.number(), days_max: z.number() }),
   utm: z.object({ source: z.string().optional(), medium: z.string().optional(), campaign: z.string().optional(), term: z.string().optional(), content: z.string().optional() }).optional(),
-  consent: z.boolean()
+  consent: z.boolean(),
+  consent_v: z.string().optional(),
+  consent_ts: z.string().optional(),
+  ip_hash: z.string().optional()
 });
 
 export default async function handler(req: any, res: any) {
@@ -28,6 +32,14 @@ export default async function handler(req: any, res: any) {
   const parsed = LeadSchema.safeParse(req.body);
   if (!parsed.success) return res.status(422).json({ error: "validation_failed", details: parsed.error.flatten() });
   const lead = parsed.data;
+  lead.consent_v = process.env.CONSENT_VERSION || "1";
+  lead.consent_ts = new Date().toISOString();
+  const ip =
+    (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0] ||
+    (req.headers["x-real-ip"] as string | undefined) ||
+    req.socket?.remoteAddress ||
+    "";
+  lead.ip_hash = createHash("sha256").update(ip).digest("hex");
 
   const deeplink = buildWhatsAppLink({
     phone: process.env.BUSINESS_WHATSAPP_PHONE!,
