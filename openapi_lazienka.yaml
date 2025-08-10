@@ -80,6 +80,9 @@ paths:
                     term: { type: string }
                     content: { type: string }
                 consent: { type: boolean }
+                consent_v: { type: string, readOnly: true }
+                consent_ts: { type: string, format: date-time, readOnly: true }
+                ip_hash: { type: string, readOnly: true }
       responses:
         "200":
           description: Lead created

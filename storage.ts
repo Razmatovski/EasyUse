@@ -11,7 +11,16 @@ async function saveToSheets(lead: any): Promise<string> {
   );
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${process.env.GOOGLE_SHEETS_ID}/values/Sheet1!A1:append?valueInputOption=RAW`;
   const body = {
-    values: [[new Date().toISOString(), lead.name, lead.phone, lead.email, JSON.stringify(lead)]]
+    values: [[
+      new Date().toISOString(),
+      lead.name,
+      lead.phone,
+      lead.email,
+      lead.consent_v,
+      lead.consent_ts,
+      lead.ip_hash,
+      JSON.stringify(lead)
+    ]]
   };
   const res = await fetch(url, {
     method: "POST",
