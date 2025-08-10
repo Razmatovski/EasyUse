@@ -255,7 +255,7 @@ const LeadSchema = z.object({
   preferred_channel: z.enum(["whatsapp","email","phone"]),
   callback_window: z.enum(["morning","day","evening"]).optional(),
   lang: z.enum(["pl","en","ua"]),
-  quiz_answers: z.record(z.any()),
+  quiz_answers: z.record(z.string(), z.any()),
   estimate: z.object({
     low: z.number(), high: z.number(), days_min: z.number(), days_max: z.number()
   }),
@@ -290,7 +290,10 @@ export default async function handler(req:any,res:any){
   const leadId = await saveLead({ ...lead, whatsapp_deeplink: deeplink });
 
   // Письма
-  const emailSent = await sendClientEmail(lead.lang, lead.email ?? "", lead.estimate);
+  let emailSent = false;
+  if (lead.email) {
+    emailSent = !!(await sendClientEmail(lead.lang, lead.email, lead.estimate));
+  }
   await sendAdminEmail({ lead, leadId, deeplink });
 
   // Telegram админу (основной канал уведомления)
