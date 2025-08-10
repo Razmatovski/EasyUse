@@ -16,7 +16,7 @@ const LeadSchema = z.object({
   lang: z.enum(["pl","en","ua"]),
   postal_code: z.string().optional(),
   serviceable: z.boolean().default(true),
-  quiz_answers: z.record(z.any()),
+  quiz_answers: z.record(z.string(), z.any()),
   estimate: z.object({ low: z.number(), high: z.number(), days_min: z.number(), days_max: z.number() }),
   utm: z.object({ source: z.string().optional(), medium: z.string().optional(), campaign: z.string().optional(), term: z.string().optional(), content: z.string().optional() }).optional(),
   consent: z.boolean(),
@@ -65,7 +65,10 @@ export default async function handler(req: any, res: any) {
 
   sendServerEvent(lead.serviceable ? "lead_valid" : "lead_reject", gaParams, lead.ip_hash);
 
-  const emailSent = await sendClientEmail(lead.lang, lead.email ?? "", lead.estimate);
+  let emailSent = false;
+  if (lead.email) {
+    emailSent = !!(await sendClientEmail(lead.lang, lead.email, lead.estimate));
+  }
 
   const delays = [500, 2000, 5000];
   let notified = false;
