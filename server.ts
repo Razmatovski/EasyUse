@@ -1,8 +1,10 @@
 import express from 'express';
+import path from 'path';
 import { calculateEstimate } from './estimate';
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/estimate', (req, res) => {
   const { area_m2, scope, tile_type, plumbing } = req.body;
