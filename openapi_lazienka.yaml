@@ -1,0 +1,93 @@
+openapi: 3.0.0
+info:
+  title: Lazienka Lead & Estimate API
+  version: 1.1.0
+servers:
+  - url: https://example.com
+paths:
+  /api/estimate:
+    post:
+      summary: Calculate price/time range and serviceability
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [area_m2, scope, tile_type, plumbing]
+              properties:
+                area_m2: { type: string, enum: ["2-4","4-6","6-8","8+"] }
+                scope: { type: string, enum: ["tiling_only","full_renovation_no_furniture","turnkey_with_fixtures_furniture"] }
+                tile_type: { type: string, enum: ["<=60x60",">=60x120","mosaic"] }
+                plumbing:
+                  type: object
+                  properties:
+                    wall_hung_wc: { type: boolean }
+                    shower_or_bath: { type: boolean }
+                    vanity_sink: { type: boolean }
+                    rain_shower: { type: boolean }
+                    floor_heating: { type: boolean }
+                postal_code:
+                  type: string
+                  description: Polish postal code (NN-NNN), optional but recommended
+      responses:
+        "200":
+          description: Estimate with serviceability
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  low: { type: integer }
+                  high: { type: integer }
+                  days_min: { type: integer }
+                  days_max: { type: integer }
+                  serviceable: { type: boolean }
+                  distance_km: { type: number, nullable: true }
+  /api/leads:
+    post:
+      summary: Create lead, save to storage, send emails, notify Telegram, return WhatsApp deeplink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, phone, preferred_channel, lang, quiz_answers, estimate, consent]
+              properties:
+                name: { type: string, minLength: 2, maxLength: 60 }
+                phone: { type: string, description: "E.164 (+48…)" }
+                email: { type: string, nullable: true }
+                preferred_channel: { type: string, enum: ["whatsapp","email","phone"] }
+                callback_window: { type: string, enum: ["morning","day","evening"], nullable: true }
+                lang: { type: string, enum: ["pl","en","ua"] }
+                postal_code: { type: string, nullable: true }
+                serviceable: { type: boolean, description: "Within 30 km radius" }
+                quiz_answers: { type: object }
+                estimate:
+                  type: object
+                  properties:
+                    low: { type: integer }
+                    high: { type: integer }
+                    days_min: { type: integer }
+                    days_max: { type: integer }
+                utm:
+                  type: object
+                  properties:
+                    source: { type: string }
+                    medium: { type: string }
+                    campaign: { type: string }
+                    term: { type: string }
+                    content: { type: string }
+                consent: { type: boolean }
+      responses:
+        "200":
+          description: Lead created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lead_id: { type: string }
+                  whatsapp_deeplink: { type: string }
+                  email_sent: { type: boolean }
