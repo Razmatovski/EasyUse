@@ -10,7 +10,7 @@ Imię: *${lead.name}*
 Telefon: [${lead.phone}](tel:${lead.phone})  (${lead.preferred_channel})
 Język: ${langFlag} ${lead.lang.toUpperCase()}
 
-*Zakres*: ${lead.scope} | *Pow.*: ${lead.quiz_answers?.area_m2} | *Płytka*: ${lead.quiz_answers?.tile_type}
+*Zakres*: ${lead.quiz_answers?.scope} | *Pow.*: ${lead.quiz_answers?.area_m2} | *Płytka*: ${lead.quiz_answers?.tile_type}
 *Dodatki*: WC:${lead.quiz_answers?.plumbing?.wall_hung_wc?'✓':'—'}, Prysz/Wanna:${lead.quiz_answers?.plumbing?.shower_or_bath?'✓':'—'}, Umywalka:${lead.quiz_answers?.plumbing?.vanity_sink?'✓':'—'}, Deszczownica:${lead.quiz_answers?.plumbing?.rain_shower?'✓':'—'}, Ogrzewanie:${lead.quiz_answers?.plumbing?.floor_heating?'✓':'—'}
 
 *Szacunek*: ${lead.estimate.low}-${lead.estimate.high} PLN | ${lead.estimate.days_min}-${lead.estimate.days_max} dni
