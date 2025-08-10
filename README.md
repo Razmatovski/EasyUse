@@ -20,7 +20,6 @@
    SMTP_PORT=587
    SMTP_USER=apikey
    SMTP_PASS=xxxxxxxx
-   EMAIL_FROM=no-reply@example.com
    ADMIN_EMAIL=admin@example.com
    TELEGRAM_BOT_TOKEN=123456:ABC...
    TELEGRAM_CHAT_ID=-1001234567890
