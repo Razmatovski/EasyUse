@@ -50,9 +50,24 @@ export default async function handler(req: any, res: any) {
   const leadId = await saveLead({ ...lead, whatsapp_deeplink: deeplink });
 
   const emailSent = await sendClientEmail(lead.lang, lead.email ?? "", lead.estimate);
-  await sendAdminEmail({ lead, leadId, deeplink });
 
-  await notifyTelegram({ lead, leadId, deeplink }).catch(() => {});
+  const delays = [500, 2000, 5000];
+  let notified = false;
+  for (let i = 0; i <= delays.length; i++) {
+    try {
+      await notifyTelegram({ lead, leadId, deeplink });
+      notified = true;
+      break;
+    } catch (e) {
+      console.error("notifyTelegram failed", e);
+      const delay = delays[i];
+      if (delay) await new Promise(res => setTimeout(res, delay));
+    }
+  }
+  if (!notified) {
+    console.error("notifyTelegram failed after retries, sending admin email");
+    await sendAdminEmail({ lead, leadId, deeplink });
+  }
 
   return res.status(200).json({ lead_id: leadId, whatsapp_deeplink: deeplink, email_sent: !!emailSent });
 }
