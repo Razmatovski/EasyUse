@@ -1,5 +1,10 @@
 import nodemailer from "nodemailer";
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+if (!ADMIN_EMAIL) {
+  throw new Error("ADMIN_EMAIL environment variable is required");
+}
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp-relay.brevo.com",
   port: Number(process.env.SMTP_PORT || 587),
@@ -27,7 +32,7 @@ export async function sendClientEmail(
     ua: `Орієнтовна вартість: ${estimate.low}-${estimate.high} PLN. Термін: ${estimate.days_min}-${estimate.days_max} днів.`
   }[lang];
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM!,
+    from: ADMIN_EMAIL,
     to,
     subject,
     text
@@ -45,8 +50,8 @@ export async function sendAdminEmail({
   const subject = `New lead ${leadId}`;
   const text = `Name: ${lead.name}\nPhone: ${lead.phone}\nWhatsApp: ${deeplink}\nLang: ${lead.lang}`;
   await transporter.sendMail({
-    from: process.env.EMAIL_FROM!,
-    to: process.env.ADMIN_EMAIL!,
+    from: ADMIN_EMAIL,
+    to: ADMIN_EMAIL,
     subject,
     text
   });
