@@ -5,6 +5,7 @@ import { sendClientEmail, sendAdminEmail } from "../mail";
 import { saveLead } from "../storage";
 import { verifyTurnstile } from "../turnstile";
 import { createHash } from "crypto";
+import { sendServerEvent } from "../ga4";
 
 const LeadSchema = z.object({
   name: z.string().min(2).max(60),
@@ -41,6 +42,19 @@ export default async function handler(req: any, res: any) {
     "";
   lead.ip_hash = createHash("sha256").update(ip).digest("hex");
 
+  const gaParams: Record<string, any> = {
+    lang: lead.lang,
+    serviceable: lead.serviceable,
+    ab_bucket: (req.body as any)?.ab_bucket,
+    utm_source: lead.utm?.source,
+    utm_medium: lead.utm?.medium,
+    utm_campaign: lead.utm?.campaign,
+    utm_term: lead.utm?.term,
+    utm_content: lead.utm?.content
+  };
+
+  sendServerEvent("lead_submit_server", gaParams, lead.ip_hash);
+
   const deeplink = buildWhatsAppLink({
     phone: process.env.BUSINESS_WHATSAPP_PHONE!,
     lang: lead.lang,
@@ -48,6 +62,8 @@ export default async function handler(req: any, res: any) {
   });
 
   const leadId = await saveLead({ ...lead, whatsapp_deeplink: deeplink });
+
+  sendServerEvent(lead.serviceable ? "lead_valid" : "lead_reject", gaParams, lead.ip_hash);
 
   const emailSent = await sendClientEmail(lead.lang, lead.email ?? "", lead.estimate);
 
