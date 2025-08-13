@@ -1,0 +1,5 @@
+body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+#hero { text-align: center; margin-top: 40px; }
+.step { display: none; }
+#nav { margin-top: 20px; }
+button { padding: 8px 16px; margin: 4px; }

@@ -5,7 +5,7 @@ import { distanceFromZip } from './helpers/geo';
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 app.post('/api/estimate', (req, res) => {
   const { area_m2, scope, tile_type, plumbing, postal_code } = req.body;
