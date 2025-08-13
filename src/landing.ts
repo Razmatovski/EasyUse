@@ -4,8 +4,37 @@ import ScrollToPlugin from 'gsap/ScrollToPlugin';
 
 gsap.registerPlugin(ScrollToPlugin);
 const translations: Record<string, any> = {};
+const measurementId = import.meta.env.VITE_GA4_MEASUREMENT_ID;
 
 const state: any = { plumbing: {}, bathrooms: 1 };
+const params = new URLSearchParams(window.location.search);
+state.utm = {
+  source: params.get('utm_source') || undefined,
+  medium: params.get('utm_medium') || undefined,
+  campaign: params.get('utm_campaign') || undefined,
+  term: params.get('utm_term') || undefined,
+  content: params.get('utm_content') || undefined
+};
+const utmParams = {
+  utm_source: state.utm.source,
+  utm_medium: state.utm.medium,
+  utm_campaign: state.utm.campaign,
+  utm_term: state.utm.term,
+  utm_content: state.utm.content
+};
+
+function gaEvent(name: string, params: Record<string, any> = {}) {
+  const gtag = (window as any).gtag;
+  if (gtag) gtag('event', name, { ...utmParams, ...params });
+}
+
+function getClientId(): Promise<string | undefined> {
+  return new Promise(resolve => {
+    const gtag = (window as any).gtag;
+    if (!gtag || !measurementId) return resolve(undefined);
+    gtag('get', measurementId, 'client_id', (cid: string) => resolve(cid));
+  });
+}
 
 async function setLanguage(lang: string) {
   if (!translations[lang]) {
@@ -52,6 +81,8 @@ function showStep(i: number) {
 }
 
 startBtn.onclick = () => {
+  gaEvent('start');
+  getClientId().then(cid => (state.ga_client_id = cid));
   gsap.to(hero, { autoAlpha: 0, duration: 0.3, onComplete: () => (hero.style.display = 'none') });
   form.style.display = 'block';
   gsap.fromTo(form, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 });
@@ -118,6 +149,7 @@ nextBtn.onclick = async () => {
     state.distance_km = data.distance_km;
     document.getElementById('result')!.textContent =
       `${data.low}-${data.high} PLN, ${data.days_min}-${data.days_max} dni`;
+    state.ga_client_id = await getClientId();
     fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -130,7 +162,9 @@ nextBtn.onclick = async () => {
     });
     (document.getElementById('waLink') as HTMLAnchorElement).href = wa;
     (document.getElementById('callLink') as HTMLAnchorElement).href = 'tel:48500111222';
+    gaEvent('lead_submit');
   }
+  gaEvent('step_completed', { step: currentStep });
   if (currentStep < steps.length - 1) {
     currentStep++;
     showStep(currentStep);
