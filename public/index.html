@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Łazienka pod klucz</title>
+  <link rel="icon" href="data:," />
   <style>
     body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
     #hero { text-align: center; margin-top: 40px; }
@@ -129,6 +130,7 @@ const translations = {
     next: 'Далі'
   }
 };
+const state = { plumbing:{} };
 function setLanguage(lang){
   const dict = translations[lang];
   document.querySelectorAll('[data-i18n]').forEach(el=>{
@@ -150,7 +152,6 @@ const steps = Array.from(document.querySelectorAll('.step'));
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 let currentStep = 0;
-const state = { plumbing:{} };
 function showStep(i){
   steps.forEach((s, idx)=> s.style.display = idx===i ? 'block':'none');
   if(i===0) prevBtn.style.display='none'; else prevBtn.style.display='inline-block';
