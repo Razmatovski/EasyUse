@@ -1,4 +1,9 @@
 
+import { gsap } from 'gsap';
+import ScrollToPlugin from 'gsap/ScrollToPlugin';
+
+gsap.registerPlugin(ScrollToPlugin);
+
 const translations = {
   pl: {
     heroTitle: 'Łazienka pod klucz',
@@ -81,15 +86,27 @@ const prevBtn = document.getElementById('prevBtn') as HTMLButtonElement;
 const nextBtn = document.getElementById('nextBtn') as HTMLButtonElement;
 let currentStep = 0;
 
+form.style.display = 'none';
+
 function showStep(i: number) {
-  steps.forEach((s, idx) => (s.style.display = idx === i ? 'block' : 'none'));
+  steps.forEach((s, idx) => {
+    if (idx === i) {
+      s.style.display = 'block';
+      gsap.fromTo(s, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 });
+    } else if (s.style.display !== 'none') {
+      gsap.to(s, { autoAlpha: 0, duration: 0.3, onComplete: () => (s.style.display = 'none') });
+    } else {
+      s.style.display = 'none';
+    }
+  });
   prevBtn.style.display = i === 0 ? 'none' : 'inline-block';
   nextBtn.style.display = i === steps.length - 1 ? 'none' : 'inline-block';
 }
 
 startBtn.onclick = () => {
-  hero.style.display = 'none';
+  gsap.to(hero, { autoAlpha: 0, duration: 0.3, onComplete: () => (hero.style.display = 'none') });
   form.style.display = 'block';
+  gsap.fromTo(form, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 });
   showStep(0);
 };
 
@@ -169,6 +186,9 @@ nextBtn.onclick = async () => {
   if (currentStep < steps.length - 1) {
     currentStep++;
     showStep(currentStep);
+    if (currentStep === steps.length - 1) {
+      gsap.to(window, { duration: 0.5, scrollTo: steps[currentStep] });
+    }
   }
 };
 
