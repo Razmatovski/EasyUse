@@ -22,7 +22,8 @@ const LeadSchema = z.object({
   consent: z.boolean(),
   consent_v: z.string().optional(),
   consent_ts: z.string().optional(),
-  ip_hash: z.string().optional()
+  ip_hash: z.string().optional(),
+  ga_client_id: z.string().optional()
 });
 
 export default async function handler(req: any, res: any) {
@@ -53,7 +54,7 @@ export default async function handler(req: any, res: any) {
     utm_content: lead.utm?.content
   };
 
-  sendServerEvent("lead_submit_server", gaParams, lead.ip_hash);
+  sendServerEvent("lead_submit_server", gaParams, lead.ga_client_id || lead.ip_hash);
 
   const deeplink = buildWhatsAppLink({
     phone: process.env.BUSINESS_WHATSAPP_PHONE!,
@@ -63,7 +64,7 @@ export default async function handler(req: any, res: any) {
 
   const leadId = await saveLead({ ...lead, whatsapp_deeplink: deeplink });
 
-  sendServerEvent(lead.serviceable ? "lead_valid" : "lead_reject", gaParams, lead.ip_hash);
+  sendServerEvent(lead.serviceable ? "lead_valid" : "lead_reject", gaParams, lead.ga_client_id || lead.ip_hash);
 
   let emailSent = false;
   if (lead.email) {
