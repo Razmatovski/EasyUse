@@ -14,7 +14,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [area_m2, scope, tile_type, plumbing]
+              required: [area_m2, scope, tile_type, plumbing, bathrooms]
               properties:
                 area_m2: { type: string, enum: ["2-4","4-6","6-8","8+"] }
                 scope: { type: string, enum: ["tiling_only","full_renovation_no_furniture","turnkey_with_fixtures_furniture"] }
@@ -22,11 +22,12 @@ paths:
                 plumbing:
                   type: object
                   properties:
-                    wall_hung_wc: { type: boolean }
-                    shower_or_bath: { type: boolean }
-                    vanity_sink: { type: boolean }
-                    rain_shower: { type: boolean }
-                    floor_heating: { type: boolean }
+                    wall_hung_wc: { type: integer, minimum: 0 }
+                    shower_or_bath: { type: integer, minimum: 0 }
+                    vanity_sink: { type: integer, minimum: 0 }
+                    rain_shower: { type: integer, minimum: 0 }
+                    floor_heating: { type: integer, minimum: 0 }
+                bathrooms: { type: integer, minimum: 1 }
                 postal_code:
                   type: string
                   description: Polish postal code (NN-NNN), optional but recommended
