@@ -3,78 +3,26 @@ import { gsap } from 'gsap';
 import ScrollToPlugin from 'gsap/ScrollToPlugin';
 
 gsap.registerPlugin(ScrollToPlugin);
-
-const translations = {
-  pl: {
-    heroTitle: 'Łazienka pod klucz',
-    heroSubtitle: 'Szybka wycena online',
-    start: 'Rozpocznij',
-    postalCode: 'Kod pocztowy',
-    areaQuestion: 'Powierzchnia łazienki?',
-    bathroomsQuestion: 'Ilość łazienek?',
-    scopeQuestion: 'Zakres prac?',
-    tileQuestion: 'Typ płytek?',
-    plumbingQuestion: 'Dodatki hydrauliczne?',
-    name: 'Imię',
-    phone: 'Telefon',
-    resultText: 'Szacunkowa wycena:',
-    whatsapp: 'WhatsApp',
-    call: 'Zadzwoń',
-    prev: 'Wstecz',
-    next: 'Dalej'
-  },
-  en: {
-    heroTitle: 'Turnkey bathroom',
-    heroSubtitle: 'Quick online quote',
-    start: 'Start',
-    postalCode: 'Postal code',
-    areaQuestion: 'Bathroom area?',
-    bathroomsQuestion: 'Number of bathrooms?',
-    scopeQuestion: 'Scope of work?',
-    tileQuestion: 'Tile type?',
-    plumbingQuestion: 'Plumbing extras?',
-    name: 'Name',
-    phone: 'Phone',
-    resultText: 'Estimated quote:',
-    whatsapp: 'WhatsApp',
-    call: 'Call',
-    prev: 'Back',
-    next: 'Next'
-  },
-  ua: {
-    heroTitle: 'Ванна кімната під ключ',
-    heroSubtitle: 'Швидкий розрахунок онлайн',
-    start: 'Почати',
-    postalCode: 'Поштовий індекс',
-    areaQuestion: 'Площа ванної?',
-    bathroomsQuestion: 'Кількість ванних кімнат?',
-    scopeQuestion: 'Обсяг робіт?',
-    tileQuestion: 'Тип плитки?',
-    plumbingQuestion: 'Додаткова сантехніка?',
-    name: 'Імʼя',
-    phone: 'Телефон',
-    resultText: 'Приблизна оцінка:',
-    whatsapp: 'WhatsApp',
-    call: 'Дзвінок',
-    prev: 'Назад',
-    next: 'Далі'
-  }
-};
+const translations: Record<string, any> = {};
 
 const state: any = { plumbing: {}, bathrooms: 1 };
 
-function setLanguage(lang: string) {
-  const dict = translations[lang as keyof typeof translations];
+async function setLanguage(lang: string) {
+  if (!translations[lang]) {
+    const res = await fetch(`/i18n/${lang}.json`);
+    translations[lang] = await res.json();
+  }
+  const dict = translations[lang];
   document.querySelectorAll<HTMLElement>('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
-    if (key && (dict as any)[key]) el.textContent = (dict as any)[key];
+    if (key && dict[key]) el.textContent = dict[key];
   });
   state.lang = lang;
 }
 
 const langSel = document.getElementById('lang') as HTMLSelectElement;
 langSel.value = (navigator.language || 'pl').substring(0, 2);
-if (!translations[langSel.value as keyof typeof translations]) langSel.value = 'pl';
+if (!['pl', 'en', 'ua'].includes(langSel.value)) langSel.value = 'pl';
 setLanguage(langSel.value);
 langSel.addEventListener('change', e => setLanguage((e.target as HTMLSelectElement).value));
 
