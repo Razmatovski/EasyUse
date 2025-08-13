@@ -9,12 +9,13 @@ describe('/api/estimate handler', () => {
         scope: 'tiling_only',
         tile_type: '<=60x60',
         plumbing: {
-          wall_hung_wc: false,
-          shower_or_bath: false,
-          vanity_sink: false,
-          rain_shower: false,
-          floor_heating: false
+          wall_hung_wc: 0,
+          shower_or_bath: 0,
+          vanity_sink: 0,
+          rain_shower: 0,
+          floor_heating: 0
         },
+        bathrooms: 1,
         postal_code: '50-001'
       }
     };

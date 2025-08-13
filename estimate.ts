@@ -15,7 +15,8 @@ export function calculateEstimate(
   area_m2: AreaRange,
   scope: Scope,
   tile_type: TileType,
-  plumbing: { wall_hung_wc: boolean; shower_or_bath: boolean; vanity_sink: boolean; rain_shower: boolean; floor_heating: boolean; }
+  plumbing: { wall_hung_wc: number; shower_or_bath: number; vanity_sink: number; rain_shower: number; floor_heating: number; },
+  bathrooms: number
 ) {
   const baseRate: Record<Scope, number> = {
     tiling_only: 800,
@@ -24,7 +25,8 @@ export function calculateEstimate(
   };
 
   const area = midpoint(area_m2);
-  let labor = baseRate[scope] * area;
+  const totalArea = area * bathrooms;
+  let labor = baseRate[scope] * totalArea;
 
   const tileCoef: Record<TileType, number> = {
     "<=60x60": 1.00,
@@ -37,11 +39,11 @@ export function calculateEstimate(
   labor *= demolitionCoef;
 
   let addons = 0;
-  if (plumbing.wall_hung_wc) addons += 800;
-  if (plumbing.shower_or_bath) addons += 1200;
-  if (plumbing.vanity_sink) addons += 700;
-  if (plumbing.rain_shower) addons += 900;
-  if (plumbing.floor_heating) addons += 300 * area;
+  if (plumbing.wall_hung_wc) addons += 800 * plumbing.wall_hung_wc;
+  if (plumbing.shower_or_bath) addons += 1200 * plumbing.shower_or_bath;
+  if (plumbing.vanity_sink) addons += 700 * plumbing.vanity_sink;
+  if (plumbing.rain_shower) addons += 900 * plumbing.rain_shower;
+  if (plumbing.floor_heating) addons += 300 * area * plumbing.floor_heating;
 
   const estimate_low = Math.round((labor * 0.95 + addons * 0.9) / 100) * 100;
   const estimate_high = Math.round((labor * 1.10 + addons * 1.1) / 100) * 100;
@@ -52,6 +54,9 @@ export function calculateEstimate(
   if (scope === "turnkey_with_fixtures_furniture") { daysMin = 12; daysMax = 20; }
   if (tile_type !== "<=60x60") daysMax += 2;
   if (plumbing.floor_heating) daysMax += 1;
+
+  daysMin *= bathrooms;
+  daysMax *= bathrooms;
 
   return { low: estimate_low, high: estimate_high, days_min: daysMin, days_max: daysMax };
 }
