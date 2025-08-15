@@ -75,14 +75,17 @@ export default async function handler(req: any, res: any) {
   let notified = false;
   for (let i = 0; i <= delays.length; i++) {
     try {
-      await notifyTelegram({ lead, leadId, deeplink });
-      notified = true;
-      break;
+      const success = await notifyTelegram({ lead, leadId, deeplink });
+      if (success) {
+        notified = true;
+        break;
+      }
+      console.error("notifyTelegram failed");
     } catch (e) {
-      console.error("notifyTelegram failed", e);
-      const delay = delays[i];
-      if (delay) await new Promise(res => setTimeout(res, delay));
+      console.error("notifyTelegram error", e);
     }
+    const delay = delays[i];
+    if (delay) await new Promise(res => setTimeout(res, delay));
   }
   if (!notified) {
     console.error("notifyTelegram failed after retries, sending admin email");
