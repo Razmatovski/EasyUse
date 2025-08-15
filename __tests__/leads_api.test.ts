@@ -5,7 +5,7 @@ jest.mock('../wa', () => ({
   buildWhatsAppLink: jest.fn().mockReturnValue('wa_link')
 }));
 jest.mock('../notify', () => ({
-  notifyTelegram: jest.fn().mockResolvedValue(undefined)
+  notifyTelegram: jest.fn().mockResolvedValue(true)
 }));
 jest.mock('../mail', () => ({
   sendClientEmail: jest.fn().mockResolvedValue(true),
