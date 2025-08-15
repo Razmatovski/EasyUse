@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { Lead } from './types/lead';
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 if (!ADMIN_EMAIL) {
@@ -50,7 +51,7 @@ export async function sendAdminEmail({
   leadId,
   deeplink
 }:{
-  lead: any; leadId: string; deeplink: string;
+  lead: Lead; leadId: string; deeplink: string;
 }){
   const subject = `New lead ${leadId}`;
   const text = `Name: ${lead.name}\nPhone: ${lead.phone}\nWhatsApp: ${deeplink}\nLang: ${lead.lang}`;

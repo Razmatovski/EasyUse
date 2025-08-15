@@ -1,4 +1,5 @@
 import { JWT } from "google-auth-library";
+import { Lead } from './types/lead';
 
 const jwt = new JWT({
   email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
@@ -22,7 +23,7 @@ async function getSheetsToken(): Promise<string> {
   return token;
 }
 
-async function saveToSheets(lead: any): Promise<string> {
+async function saveToSheets(lead: Lead): Promise<string> {
   const token = await getSheetsToken();
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${process.env.GOOGLE_SHEETS_ID}/values/Sheet1!A1:append?valueInputOption=RAW`;
   const body = {
@@ -50,7 +51,7 @@ async function saveToSheets(lead: any): Promise<string> {
   return data.updates?.updatedRange ?? Date.now().toString();
 }
 
-async function saveToPipedrive(lead: any): Promise<string> {
+async function saveToPipedrive(lead: Lead): Promise<string> {
   const url = `${process.env.PIPEDRIVE_BASE_URL || "https://api.pipedrive.com/v1"}/leads?api_token=${process.env.PIPEDRIVE_API_TOKEN}`;
   const res = await fetch(url, {
     method: "POST",
@@ -66,7 +67,7 @@ async function saveToPipedrive(lead: any): Promise<string> {
   return String(data.data?.id || Date.now());
 }
 
-export async function saveLead(lead: any): Promise<string> {
+export async function saveLead(lead: Lead): Promise<string> {
   try {
     if (process.env.GOOGLE_SHEETS_ID && process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL && process.env.GOOGLE_PRIVATE_KEY) {
       return await saveToSheets(lead);

@@ -6,6 +6,7 @@ import { saveLead } from "../storage";
 import { verifyTurnstile } from "../turnstile";
 import { createHash } from "crypto";
 import { sendServerEvent } from "../ga4";
+import { Lead } from "../types/lead";
 
 const LeadSchema = z.object({
   name: z.string().min(2).max(60),
@@ -33,7 +34,7 @@ export default async function handler(req: any, res: any) {
 
   const parsed = LeadSchema.safeParse(req.body);
   if (!parsed.success) return res.status(422).json({ error: "validation_failed", details: parsed.error.flatten() });
-  const lead = parsed.data;
+  const lead: Lead = parsed.data;
   lead.consent_v = process.env.CONSENT_VERSION || "1";
   lead.consent_ts = new Date().toISOString();
   const ip =
