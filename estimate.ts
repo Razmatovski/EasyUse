@@ -11,6 +11,18 @@ function midpoint(area: AreaRange): number {
   }
 }
 
+const baseRate: Record<Scope, number> = {
+  tiling_only: 800,
+  full_renovation_no_furniture: 1200,
+  turnkey_with_fixtures_furniture: 1500
+};
+
+const tileCoef: Record<TileType, number> = {
+  "<=60x60": 1.00,
+  ">=60x120": 1.15,
+  "mosaic": 1.20
+};
+
 export function calculateEstimate(
   area_m2: AreaRange,
   scope: Scope,
@@ -18,21 +30,9 @@ export function calculateEstimate(
   plumbing: { wall_hung_wc: number; shower_or_bath: number; vanity_sink: number; rain_shower: number; floor_heating: number; },
   bathrooms: number
 ) {
-  const baseRate: Record<Scope, number> = {
-    tiling_only: 800,
-    full_renovation_no_furniture: 1200,
-    turnkey_with_fixtures_furniture: 1500
-  };
-
   const area = midpoint(area_m2);
   const totalArea = area * bathrooms;
   let labor = baseRate[scope] * totalArea;
-
-  const tileCoef: Record<TileType, number> = {
-    "<=60x60": 1.00,
-    ">=60x120": 1.15,
-    "mosaic": 1.20
-  };
   labor *= tileCoef[tile_type];
 
   const demolitionCoef = (scope === "tiling_only") ? 1.05 : 1.20;
