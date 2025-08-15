@@ -1,5 +1,7 @@
+import { Lead } from './types/lead';
+
 export async function notifyTelegram({ lead, leadId, deeplink }: {
-  lead: any; leadId: string; deeplink: string;
+  lead: Lead; leadId: string; deeplink: string;
 }): Promise<boolean> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
