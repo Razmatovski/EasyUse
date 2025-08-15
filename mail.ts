@@ -31,13 +31,18 @@ export async function sendClientEmail(
     en: `Estimated cost: ${estimate.low}-${estimate.high} PLN. Timeline: ${estimate.days_min}-${estimate.days_max} days.`,
     ua: `Орієнтовна вартість: ${estimate.low}-${estimate.high} PLN. Термін: ${estimate.days_min}-${estimate.days_max} днів.`
   }[lang];
-  await transporter.sendMail({
-    from: ADMIN_EMAIL,
-    to,
-    subject,
-    text
-  });
-  return true;
+  try {
+    await transporter.sendMail({
+      from: ADMIN_EMAIL,
+      to,
+      subject,
+      text
+    });
+    return true;
+  } catch (e) {
+    console.error("sendClientEmail failed", e);
+    return false;
+  }
 }
 
 export async function sendAdminEmail({
@@ -49,10 +54,15 @@ export async function sendAdminEmail({
 }){
   const subject = `New lead ${leadId}`;
   const text = `Name: ${lead.name}\nPhone: ${lead.phone}\nWhatsApp: ${deeplink}\nLang: ${lead.lang}`;
-  await transporter.sendMail({
-    from: ADMIN_EMAIL,
-    to: ADMIN_EMAIL,
-    subject,
-    text
-  });
+  try {
+    await transporter.sendMail({
+      from: ADMIN_EMAIL,
+      to: ADMIN_EMAIL,
+      subject,
+      text
+    });
+  } catch (e) {
+    console.error("sendAdminEmail failed", e);
+    throw e;
+  }
 }
