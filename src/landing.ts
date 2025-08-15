@@ -53,7 +53,9 @@ const langSel = document.getElementById('lang') as HTMLSelectElement;
 langSel.value = (navigator.language || 'pl').substring(0, 2);
 if (!['pl', 'en', 'ua'].includes(langSel.value)) langSel.value = 'pl';
 setLanguage(langSel.value);
-langSel.addEventListener('change', e => setLanguage((e.target as HTMLSelectElement).value));
+langSel.addEventListener('change', (e: Event) =>
+  setLanguage((e.target as HTMLSelectElement).value)
+);
 
 const startBtn = document.getElementById('startBtn') as HTMLButtonElement;
 const hero = document.getElementById('hero') as HTMLElement;
@@ -71,7 +73,13 @@ function showStep(i: number) {
       s.style.display = 'block';
       gsap.fromTo(s, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 });
     } else if (s.style.display !== 'none') {
-      gsap.to(s, { autoAlpha: 0, duration: 0.3, onComplete: () => (s.style.display = 'none') });
+      gsap.to(s, {
+        autoAlpha: 0,
+        duration: 0.3,
+        onComplete: () => {
+          s.style.display = 'none';
+        }
+      });
     } else {
       s.style.display = 'none';
     }
@@ -83,7 +91,13 @@ function showStep(i: number) {
 startBtn.onclick = () => {
   gaEvent('start');
   getClientId().then(cid => (state.ga_client_id = cid));
-  gsap.to(hero, { autoAlpha: 0, duration: 0.3, onComplete: () => (hero.style.display = 'none') });
+  gsap.to(hero, {
+    autoAlpha: 0,
+    duration: 0.3,
+    onComplete: () => {
+      hero.style.display = 'none';
+    }
+  });
   form.style.display = 'block';
   gsap.fromTo(form, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 });
   showStep(0);
